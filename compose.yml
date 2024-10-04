@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports: 
+      - "8080:8080"
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - DB_USERNAME=${DB_USERNAME}  
+      - DB_PASSWORD=${DB_PASSWORD}  
+      - DB_URL=jdbc:postgresql://db:5432/bugtrackerlocal 
+    depends_on:
+      - db
+    networks: 
+      - bugtracker-network
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment: 
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=bugtrackerlocal
+    ports:
+      - "5432:5432"
+    networks: 
+      - bugtracker-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+networks:
+  bugtracker-network:
+    driver: bridge
+    
+volumes:
+  pgdata:
+    driver: local
