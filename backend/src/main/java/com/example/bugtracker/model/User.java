@@ -31,6 +31,10 @@ public class User {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
         }
+
+        if (username.length() > 20) { 
+            throw new IllegalArgumentException("Username cannot exceed 50 characters");
+        }
         this.username = username;
     }
 
@@ -49,7 +53,7 @@ public class User {
         this.email = email;
     }
 
-    //todo add password validation logic
+    //todo add password validation logic/criteria
     @Column(name = "password", nullable =false)
     private String password;
 
@@ -90,8 +94,5 @@ public class User {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
-
-   
-
-    
+ 
 }
