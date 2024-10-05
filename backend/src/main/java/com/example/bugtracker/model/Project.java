@@ -2,9 +2,13 @@ package com.example.bugtracker.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import com.example.bugtracker.model.enums.Priority;
 import com.example.bugtracker.model.enums.Status;
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.HashSet;
+
 
 
 
@@ -115,6 +119,30 @@ public class Project {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+
+    @Column(name = "finished_at", nullable = true)
+    private LocalDateTime finishedAt;
+
+    public LocalDateTime getFinishedAt(){
+        return finishedAt;
+    }
+
+    public void setFinishedAt(LocalDateTime finishedAt) {
+        this.finishedAt = finishedAt;
+    }
+
+
+    @OneToMany(mappedBy = "project", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    private Set<Bug> bugs = new HashSet<>();
+
+    public Set<Bug> getBugs() {
+        return bugs;
+    }
+
+    public void setBugs(Set<Bug> bugs) {
+        this.bugs = bugs;
     }
 
 }

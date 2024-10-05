@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -94,5 +96,51 @@ public class User {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+
+    @OneToMany(mappedBy = "creatorId", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    private Set<Project> projects = new HashSet<>();
+
+    public Set<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<Project> projects) {
+        this.projects = projects;
+    }
  
+
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private Set<Bug> bugs = new HashSet<>();
+
+    public Set<Bug> getBugs() {
+        return bugs;
+    }
+
+    public void addBug(Bug bug) {
+        bugs.add(bug);
+        bug.setCreator(this);
+    }
+
+    public void removeBug(Bug bug) {
+        bugs.remove(bug);
+        bug.setCreator(null);
+    }
+
+
+    @ManyToMany(mappedBy = "assignees", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private Set<Bug> assignedBugs = new HashSet<>();
+
+    public Set<Bug> getAssignedBugs() {
+        return assignedBugs;
+    }
+
+    public void setAssignedBugs(Set<Bug> assignedBugs) {
+        this.assignedBugs = assignedBugs;
+    }
+
+    public void assignBug(Bug bug) {
+        assignedBugs.add(bug);
+        bug.getAssignees().add(this);  
+    }
 }
