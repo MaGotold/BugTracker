@@ -1,7 +1,6 @@
-version: '3.8'
-
 services:
   backend:
+    container_name: backend_app
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -19,6 +18,7 @@ services:
       - bugtracker-network
 
   db:
+    container_name: server
     image: postgres:latest
     restart: always
     environment: 
@@ -32,6 +32,22 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@postgresbugtrackerlocal.com
+    #  - PGADMIN_DEFAULT_EMAIL=${PG_ADMIN}
+      - PGADMIN_DEFAULT_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - bugtracker-network
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
 networks:
   bugtracker-network:
@@ -39,4 +55,6 @@ networks:
     
 volumes:
   pgdata:
+    driver: local
+  pgadmin_data:
     driver: local
