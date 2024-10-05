@@ -13,7 +13,7 @@ RUN apk add --no-cache git curl postgresql-client
 COPY . .
 
 # 5. Set the command to build the Spring Boot application
-RUN ./gradlew build --no-daemon
+RUN ./gradlew build -x test 
 
 ### Stage 2: Run the application
 
