@@ -173,4 +173,19 @@ public class Bug {
         this.resolvedAt = resolvedAt;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "feature_id", nullable = false)
+    private Feature feature;
+
+    public Feature getFeature() {
+        return feature;
+    }
+
+    public void setFeature(Feature feature) {
+        if (feature == null) {
+            throw new IllegalArgumentException("Feature cannot be null");
+        }
+        this.feature = feature;
+    }
+
 }
