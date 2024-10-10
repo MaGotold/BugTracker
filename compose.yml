@@ -7,7 +7,7 @@ services:
     ports: 
       - "8080:8080"
     volumes:
-      - ./backend:/app/backend
+      - .:/app/src  # Mount the source code for hot reloading
     environment:
       - DB_USERNAME=${DB_USERNAME}  
       - DB_PASSWORD=${DB_PASSWORD}  
@@ -16,6 +16,7 @@ services:
       - db
     networks: 
       - bugtracker-network
+      
 
   db:
     container_name: server
@@ -37,8 +38,7 @@ services:
     image: dpage/pgadmin4
     restart: always
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@postgresbugtrackerlocal.com
-    #  - PGADMIN_DEFAULT_EMAIL=${PG_ADMIN}
+      - PGADMIN_DEFAULT_EMAIL=${PG_ADMIN}
       - PGADMIN_DEFAULT_PASSWORD=${DB_PASSWORD}
     ports:
       - "5050:80"
@@ -58,3 +58,5 @@ volumes:
     driver: local
   pgadmin_data:
     driver: local
+  #gradle_cache: 
+   # driver: local

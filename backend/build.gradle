@@ -34,3 +34,14 @@ tasks.named('test') {
 jar {
     enabled = false
 }
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
+}
+
+bootRun {
+    // Use Spring Boot DevTool only when we run Gradle bootRun task
+    classpath = sourceSets.main.runtimeClasspath
+	sourceResources sourceSets.main
+   
+}
