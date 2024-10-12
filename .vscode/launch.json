@@ -1,13 +1,12 @@
 {
     "version": "0.2.0",
     "configurations": [
-
         {
             "type": "java",
-            "name": "Launch BugTrackerApplication",
-            "request": "launch",
-            "mainClass": "com.example.BugTrackerApplication", 
-            "preLaunchTask": "java (buildArtifact): BugTracker",
+            "name": "Debug (Attach)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 5005 
         }
     ]
 }

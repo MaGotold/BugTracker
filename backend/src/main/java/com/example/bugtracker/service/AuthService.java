@@ -7,6 +7,10 @@ import com.example.bugtracker.repository.UserRepository;
 import com.example.bugtracker.security.JwtUtil;
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
+import com.example.bugtracker.exception.EmailAlreadyExistsException;
+import com.example.bugtracker.exception.InvalidPasswordException;
+import com.example.bugtracker.exception.UserAlreadyExistsException;
+import com.example.bugtracker.exception.UserNotFoundException;
 import com.example.bugtracker.model.User;
 
 
@@ -25,11 +29,11 @@ public class AuthService {
     public String registerUser(UserRegistrationDto registrationDto) {
 
         if (userRepository.existsByUsername(registrationDto.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new UserAlreadyExistsException("Username already exists");
         }
 
         if(userRepository.existsByEmail(registrationDto.getEmail())) {
-            throw new IllegalArgumentException("email already exists");
+            throw new EmailAlreadyExistsException("Email already exists");
         }
 
         try {
@@ -52,12 +56,12 @@ public class AuthService {
 
             if(userRepository.existsByEmail(signInDto.getUsernameOrEmail()) == false 
                 & userRepository.existsByUsername(signInDto.getUsernameOrEmail()) == false) {
-                    throw new IllegalArgumentException("Username or Email doesn't exist");
+                    throw new UserNotFoundException("Username or Email doesn't exist");
             }
 
-            String hashedPassword = bCryptPasswordEncoder.encode(signInDto.getPassword());
-            if(userRepository.existsByPassword(hashedPassword) == false) {
-                throw new IllegalArgumentException("Invalid password");
+            String storedHashedPassword = userRepository.findHasedPasswordByUsernameOrEmail(signInDto.getUsernameOrEmail());
+            if(!bCryptPasswordEncoder.matches(signInDto.getPassword(), storedHashedPassword)) {
+                throw new InvalidPasswordException("Invalid password");
 
             }
 

@@ -1,20 +1,41 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "java (buildArtifact)",
-			"mainClass": "com.example.bugtracker.BugTrackerApplication",
-			"targetPath": "${workspaceFolder}/${workspaceFolderBasename}.jar",
-			"elements": [
-				"${compileOutput}",
-				"${dependencies}"
-			],
-			"problemMatcher": [],
-			"label": "java (buildArtifact): BugTracker",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [
+                "build",
+				"-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Gradle build task"
+        },
+        {
+            "label": "run",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [
+                "bootRun",
+                "-Dspring-boot.run.jvmArguments=\"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005\""
+            ],
+            "group": "build",
+            "detail": "Run Spring Boot application"
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [
+                "test"
+            ],
+            "group": "test",
+            "detail": "Run tests with Gradle"
+        }
+    ]
 }
