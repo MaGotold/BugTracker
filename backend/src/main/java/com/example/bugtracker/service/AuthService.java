@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.example.bugtracker.repository.UserRepository;
 import com.example.bugtracker.security.JwtUtil;
 import com.example.bugtracker.dto.UserRegistrationDto;
+import com.example.bugtracker.dto.UserSignInDto;
 import com.example.bugtracker.model.User;
 
 
@@ -19,9 +20,9 @@ public class AuthService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private JwtUtil jwtUtil;
+   
 
     public String registerUser(UserRegistrationDto registrationDto) {
-        System.out.printf("'so far so good2'");
 
         if (userRepository.existsByUsername(registrationDto.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
@@ -30,7 +31,6 @@ public class AuthService {
         if(userRepository.existsByEmail(registrationDto.getEmail())) {
             throw new IllegalArgumentException("email already exists");
         }
-        System.out.printf("'so far so good2'");
 
         try {
             User newUser = new User();
@@ -44,6 +44,31 @@ public class AuthService {
         } catch (Exception e) {
             throw new RuntimeException("An unexpected error occurred while registering the user: " + e.getMessage(), e);
         }
+    }
+
+
+    public String userSignIn(UserSignInDto signInDto){
+        try{
+
+            if(userRepository.existsByEmail(signInDto.getUsernameOrEmail()) == false 
+                & userRepository.existsByUsername(signInDto.getUsernameOrEmail()) == false) {
+                    throw new IllegalArgumentException("Username or Email doesn't exist");
+            }
+
+            String hashedPassword = bCryptPasswordEncoder.encode(signInDto.getPassword());
+            if(userRepository.existsByPassword(hashedPassword) == false) {
+                throw new IllegalArgumentException("Invalid password");
+
+            }
+
+            User logedUser = userRepository.findByUsername(signInDto.getUsernameOrEmail());
+            return jwtUtil.generateToken(logedUser);
+        } catch (Exception e) {
+            throw new RuntimeException("An unexpected error occurred while signing in: " + e.getMessage(), e);
+        }
+
+
+
     }
     
 }

@@ -4,9 +4,9 @@
 
         {
             "type": "java",
-            "name": "Launch Application",
+            "name": "Launch BugTrackerApplication",
             "request": "launch",
-            "mainClass": "com.example.BugTracker", 
+            "mainClass": "com.example.BugTrackerApplication", 
             "preLaunchTask": "java (buildArtifact): BugTracker",
         }
     ]
