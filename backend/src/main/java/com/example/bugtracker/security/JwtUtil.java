@@ -3,6 +3,8 @@ package com.example.bugtracker.security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+
 
 import com.example.bugtracker.model.User;
 
@@ -19,6 +21,9 @@ public class JwtUtil {
 
     private String secretKey = generateSecretKey();
     private final long EXPIRATION_TIME = 1000 * 60 * 60;
+
+    @Value("${JWT_EXPIRATION_MINUTES}")
+    private long TTL_EXPIRATION_FOR_REDIS;
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
@@ -49,7 +54,9 @@ public class JwtUtil {
     }
 
     
-
+    public long getTtlExpirationForRedis() {
+        return TTL_EXPIRATION_FOR_REDIS;
+    }
 
 
     

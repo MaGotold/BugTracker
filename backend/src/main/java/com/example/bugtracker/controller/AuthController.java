@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
+import com.example.bugtracker.security.JwtUtil;
+
 import org.springframework.http.HttpStatus;
 
 
@@ -21,6 +23,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 import com.example.bugtracker.service.AuthService;
+import com.example.bugtracker.service.RedisService;
+
+
 
 
 
@@ -30,6 +35,10 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private RedisService redisService;
+    @Autowired
+    private JwtUtil jwtUtil;
     
     //todo add email verification
     //todo add password confirmation
@@ -37,6 +46,8 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> userRegistration(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
         try {
             String token = authService.registerUser(userRegistrationDto);
+            long expirationMinutes = jwtUtil.getTtlExpirationForRedis();
+            redisService.cacheJwtToken(userRegistrationDto.getUsername(), token, expirationMinutes);
             Map<String, String> response = new HashMap<>();
             response.put("JWT token", token);
             return ResponseEntity.ok(response); 
