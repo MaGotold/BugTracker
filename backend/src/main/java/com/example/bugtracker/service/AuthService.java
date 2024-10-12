@@ -52,7 +52,6 @@ public class AuthService {
 
 
     public String userSignIn(UserSignInDto signInDto){
-        try{
 
             if(userRepository.existsByEmail(signInDto.getUsernameOrEmail()) == false 
                 & userRepository.existsByUsername(signInDto.getUsernameOrEmail()) == false) {
@@ -67,11 +66,6 @@ public class AuthService {
 
             User logedUser = userRepository.findByUsername(signInDto.getUsernameOrEmail());
             return jwtUtil.generateToken(logedUser);
-        } catch (Exception e) {
-            throw new RuntimeException("An unexpected error occurred while signing in: " + e.getMessage(), e);
-        }
-
-
 
     }
     

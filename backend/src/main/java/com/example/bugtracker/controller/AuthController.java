@@ -21,11 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 import com.example.bugtracker.service.AuthService;
-import com.example.bugtracker.exception.InvalidPasswordException;
-import com.example.bugtracker.exception.UserNotFoundException;
-
-
-
 
 
 
