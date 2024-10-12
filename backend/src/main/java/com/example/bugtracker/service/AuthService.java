@@ -12,6 +12,8 @@ import com.example.bugtracker.exception.InvalidPasswordException;
 import com.example.bugtracker.exception.UserAlreadyExistsException;
 import com.example.bugtracker.exception.UserNotFoundException;
 import com.example.bugtracker.model.User;
+import java.util.HashMap;
+import java.util.Map;
 
 
 
@@ -51,7 +53,7 @@ public class AuthService {
     }
 
 
-    public String userSignIn(UserSignInDto signInDto){
+    public Map<String, String> userSignIn(UserSignInDto signInDto){
 
             if(userRepository.existsByEmail(signInDto.getUsernameOrEmail()) == false 
                 & userRepository.existsByUsername(signInDto.getUsernameOrEmail()) == false) {
@@ -64,8 +66,11 @@ public class AuthService {
 
             }
 
-            User logedUser = userRepository.findByUsername(signInDto.getUsernameOrEmail());
-            return jwtUtil.generateToken(logedUser);
+            User loggedUser = userRepository.findByUsername(signInDto.getUsernameOrEmail());
+            Map<String, String> response = new HashMap<>();
+            response.put("token", jwtUtil.generateToken(loggedUser));
+            response.put("username", loggedUser.getUsername());
+            return response;
 
     }
     
