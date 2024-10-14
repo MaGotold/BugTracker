@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
+import com.example.bugtracker.dto.UserLogoutDto;
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
 import com.example.bugtracker.security.JwtUtil;
@@ -77,14 +78,18 @@ public class AuthController {
     }
 
 
-   /*  @PostMapping("/logout")
-    public ResponseEntity<?> userLogout(@RequestHeader(name = "Authorization") String authHeader) {
-        String token = authHeader.substring(7, 0);
+    @PostMapping("/logout")
+    public ResponseEntity<?> userLogout(@RequestHeader(name = "Authorization") String authHeader, @RequestBody UserLogoutDto userLogoutDto) {
+        try{
+            String token = authHeader.substring(7);
+            redisService.deleteSession(token, userLogoutDto.getUsername());
 
-    } 
-    
-*/ 
-
+            return ResponseEntity.ok("User logged out succesfully");
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Collections.singletonMap("error", e.getMessage() ));
+        }
+    }
 }
 
 

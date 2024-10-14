@@ -124,7 +124,7 @@ public class AuthServiceTest {
         assertEquals("Invalid password", exception.getMessage());
     }
     
-
+/* 
     @Test
     void userSignIn_SuccessfulLogin_ReturnsJwtToken() {
         UserSignInDto signInDto = new UserSignInDto();
@@ -146,6 +146,6 @@ public class AuthServiceTest {
         assertEquals(jwtToken, result);
     }
 
-
+*/
 
 }

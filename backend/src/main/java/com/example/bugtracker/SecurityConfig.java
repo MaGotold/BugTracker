@@ -6,14 +6,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.SecurityFilterChain;
-
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
     
     @Bean
-    public BCryptPasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -22,12 +22,17 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/auth/sign-up","/auth/sign-in","/test-redis").permitAll() 
-                .anyRequest().authenticated() 
-            ); 
+                .requestMatchers("/auth/sign-up", "/auth/sign-in").permitAll() 
+                .requestMatchers("/auth/logout").authenticated() // Ensure logout requires authentication
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // Add JWT filter
+
         return http.build();
     }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(); // Your implementation of the filter
+    }
 }
-
-    
-
