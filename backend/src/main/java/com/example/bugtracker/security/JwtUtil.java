@@ -19,9 +19,6 @@ import java.util.Map;
 
 @Component
 public class JwtUtil {
-    
-    @Autowired
-    private StringRedisTemplate redisTemplate;
 
     private String secretKey = generateSecretKey();
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 12;
@@ -33,11 +30,9 @@ public class JwtUtil {
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
-        claims.put("username", user.getUsername());
         claims.put("email", user.getEmail());
         claims.put("role", user.getIsAdmin());
         return createToken(claims, user.getUsername());
-
     }
 
 
@@ -63,6 +58,10 @@ public class JwtUtil {
     
     public long getTtlExpirationForRedis() {
         return TTL_EXPIRATION_FOR_REDIS;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
     }
 
 
