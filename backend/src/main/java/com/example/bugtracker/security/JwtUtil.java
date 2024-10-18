@@ -18,7 +18,9 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    private String secretKey = generateSecretKey();
+    @Value("${JWT_SECRET_KEY}")
+    private String secretKey;
+    
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 12;
 
     @Value("${JWT_EXPIRATION_MINUTES}")
@@ -45,14 +47,14 @@ public class JwtUtil {
                 .compact();
     }
 
-
+    /* 
     public static String generateSecretKey(){
         SecureRandom secureRandom = new SecureRandom();
         byte[] key = new byte[32];
         secureRandom.nextBytes(key);
         return Base64.getEncoder().encodeToString(key);
     }
-
+    */
     
     public long getTtlExpirationForRedis() {
         return TTL_EXPIRATION_FOR_REDIS;
