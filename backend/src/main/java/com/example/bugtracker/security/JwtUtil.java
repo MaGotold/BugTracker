@@ -3,9 +3,7 @@ package com.example.bugtracker.security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.example.bugtracker.model.User;
 
@@ -31,7 +29,7 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
         claims.put("email", user.getEmail());
-        claims.put("role", user.getIsAdmin());
+        claims.put("role", user.getRole());
         return createToken(claims, user.getUsername());
     }
 

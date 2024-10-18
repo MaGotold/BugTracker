@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.util.HashSet;
 import java.util.Set;
+import com.example.bugtracker.model.enums.Role;
+
 
 
 @Entity
@@ -68,15 +70,16 @@ public class User {
     }
 
 
-    @Column(name = "is_admin")
-    private short isAdmin = 0;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
 
-    public short getIsAdmin(){
-        return isAdmin;
+    public Role getRole(){
+        return role;
     }
 
-    public void setIsAdmin(short isAdmin){
-        this.isAdmin = isAdmin;
+    public void setIsAdmin(Role role){
+        this.role = role;
     }
 
 

@@ -44,6 +44,7 @@ public class AuthController {
     
     //todo add email verification
     //todo add password confirmation
+    //todo changed role so specifying role upon registration is needed... add role field
     @PostMapping("/sign-up")
     public ResponseEntity<Map<String, String>> userRegistration(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
         try {
