@@ -5,12 +5,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.example.bugtracker.repository.UserRepository;
 import com.example.bugtracker.security.JwtUtil;
+
+import com.example.bugtracker.model.enums.Role;
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
 import com.example.bugtracker.exception.EmailAlreadyExistsException;
 import com.example.bugtracker.exception.InvalidPasswordException;
 import com.example.bugtracker.exception.UserAlreadyExistsException;
 import com.example.bugtracker.exception.UserNotFoundException;
+import com.example.bugtracker.exception.RoleIsMissingException;
 import com.example.bugtracker.model.User;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,11 +41,18 @@ public class AuthService {
             throw new EmailAlreadyExistsException("Email already exists");
         }
 
+        if(registrationDto.getRole() == null){
+            throw new RoleIsMissingException("Please select your role");
+        }
+
         try {
+            String role = registrationDto.getRole().name();
+            Role roleEnum = Role.valueOf(role);
             User newUser = new User();
             newUser.setUsername(registrationDto.getUsername());
             newUser.setEmail(registrationDto.getEmail());
             newUser.setPassword(bCryptPasswordEncoder.encode(registrationDto.getPassword()));
+            newUser.setRole(roleEnum);
 
             userRepository.save(newUser);
             return jwtUtil.generateToken(newUser);
@@ -69,7 +79,6 @@ public class AuthService {
             User loggedUser = userRepository.findByUsername(signInDto.getUsernameOrEmail());
             Map<String, String> response = new HashMap<>();
             response.put("token", jwtUtil.generateToken(loggedUser));
-            response.put("username", loggedUser.getUsername());
             return response;
 
     }

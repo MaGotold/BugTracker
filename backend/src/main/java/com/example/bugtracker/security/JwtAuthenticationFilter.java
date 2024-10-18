@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String username = claims.getSubject();
                     long id = claims.get("id", Long.class);
                     String email = claims.get("email", String.class);
-                    String role = claims.get("role", String.class); 
+                    String role = claims.get("role", String.class);
 
                     List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
                     UsernamePasswordAuthenticationToken authentication =
@@ -72,6 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
             }
+            filterChain.doFilter(request, respone);
         }
     
 }

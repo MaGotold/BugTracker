@@ -2,7 +2,10 @@ package com.example.bugtracker.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import com.example.bugtracker.model.enums.Role;
 
 public class UserRegistrationDto {
     
@@ -18,6 +21,9 @@ public class UserRegistrationDto {
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
+
+    @NotNull(message = "Please select your role")
+    private Role role;
 
 
     public String getUsername(){
@@ -44,6 +50,14 @@ public class UserRegistrationDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
 }

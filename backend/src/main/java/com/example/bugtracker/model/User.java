@@ -71,14 +71,17 @@ public class User {
 
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     private Role role;
 
     public Role getRole(){
         return role;
     }
 
-    public void setIsAdmin(Role role){
+    public void setRole(Role role){
+        if (role == null) {
+            throw new IllegalArgumentException("Role cannot be empty");
+        }
         this.role = role;
     }
 

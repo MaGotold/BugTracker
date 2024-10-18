@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
-import com.example.bugtracker.dto.UserLogoutDto;
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
 import com.example.bugtracker.security.JwtUtil;
@@ -37,10 +36,6 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
-    @Autowired
-    private RedisService redisService;
-    @Autowired
-    private JwtUtil jwtUtil;
     
     //todo add email verification
     //todo add password confirmation
@@ -49,8 +44,6 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> userRegistration(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
         try {
             String token = authService.registerUser(userRegistrationDto);
-            long expirationMinutes = jwtUtil.getTtlExpirationForRedis();
-            redisService.cacheJwtToken(userRegistrationDto.getUsername(), token, expirationMinutes);
             Map<String, String> response = new HashMap<>();
             response.put("JWT token", token);
             return ResponseEntity.ok(response); 
@@ -66,10 +59,6 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> userSignIn(@Valid @RequestBody UserSignInDto userSignInDto){
         try {
             Map<String, String> userInfo = authService.userSignIn(userSignInDto);
-            String username = userInfo.get("username");
-            String token = userInfo.get("token");
-            long expirationMinutes = jwtUtil.getTtlExpirationForRedis();
-            redisService.cacheJwtToken(username, token, expirationMinutes );
             return ResponseEntity.ok(userInfo);
         
         } catch (Exception e) {
@@ -80,16 +69,8 @@ public class AuthController {
 
 
     @PostMapping("/logout")
-    public ResponseEntity<?> userLogout(@RequestHeader(name = "Authorization") String authHeader, @RequestBody UserLogoutDto userLogoutDto) {
-        try{
-            String token = authHeader.substring(7);
-            redisService.deleteSession(token, userLogoutDto.getUsername());
-
-            return ResponseEntity.ok("User logged out succesfully");
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body(Collections.singletonMap("error", e.getMessage() ));
-        }
+    public ResponseEntity<?> userLogout(@RequestHeader(name = "Authorization") String authHeader) {
+        return ResponseEntity.ok("User logged out successfully.");
     }
 }
 
