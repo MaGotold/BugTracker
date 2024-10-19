@@ -7,6 +7,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
 import com.example.bugtracker.security.JwtUtil;
+import com.example.bugtracker.service.AuthService;
+import com.example.bugtracker.service.RedisService;
 
 import org.springframework.http.HttpStatus;
 
@@ -23,8 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import com.example.bugtracker.service.AuthService;
-import com.example.bugtracker.service.RedisService;
+
 
 
 
@@ -36,6 +37,10 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private RedisService redisService;
+    @Autowired
+    private JwtUtil jwtUtil;
     
     //todo add email verification
     //todo add password confirmation
@@ -43,9 +48,8 @@ public class AuthController {
     @PostMapping("/sign-up")
     public ResponseEntity<Map<String, String>> userRegistration(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
         try {
-            String token = authService.registerUser(userRegistrationDto);
-            Map<String, String> response = new HashMap<>();
-            response.put("JWT token", token);
+            Map<String, String> response = authService.registerUser(userRegistrationDto);
+            redisService.cacheJwtToken(userRegistrationDto.getUsername(), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
             return ResponseEntity.ok(response); 
 
         } catch(Exception e) {

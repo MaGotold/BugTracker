@@ -1,22 +1,23 @@
 package com.example.bugtracker.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.example.bugtracker.repository.UserRepository;
-import com.example.bugtracker.security.JwtUtil;
 
-import com.example.bugtracker.model.enums.Role;
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
 import com.example.bugtracker.exception.EmailAlreadyExistsException;
 import com.example.bugtracker.exception.InvalidPasswordException;
+import com.example.bugtracker.exception.RoleIsMissingException;
 import com.example.bugtracker.exception.UserAlreadyExistsException;
 import com.example.bugtracker.exception.UserNotFoundException;
-import com.example.bugtracker.exception.RoleIsMissingException;
 import com.example.bugtracker.model.User;
-import java.util.HashMap;
-import java.util.Map;
+import com.example.bugtracker.model.enums.Role;
+import com.example.bugtracker.repository.UserRepository;
+import com.example.bugtracker.security.JwtUtil;
 
 
 
@@ -31,7 +32,7 @@ public class AuthService {
     private JwtUtil jwtUtil;
    
 
-    public String registerUser(UserRegistrationDto registrationDto) {
+    public Map<String, String> registerUser(UserRegistrationDto registrationDto) {
 
         if (userRepository.existsByUsername(registrationDto.getUsername())) {
             throw new UserAlreadyExistsException("Username already exists");
@@ -55,7 +56,10 @@ public class AuthService {
             newUser.setRole(roleEnum);
 
             userRepository.save(newUser);
-            return jwtUtil.generateToken(newUser);
+            Map<String, String> response = new HashMap<>();
+            response.put("Access JWT token", jwtUtil.generateAccessToken(newUser));
+            response.put("Refresh JWT token", jwtUtil.generateRefreshToken(newUser));
+            return response;
             
         } catch (Exception e) {
             throw new RuntimeException("An unexpected error occurred while registering the user: " + e.getMessage(), e);
@@ -78,7 +82,7 @@ public class AuthService {
 
             User loggedUser = userRepository.findByUsername(signInDto.getUsernameOrEmail());
             Map<String, String> response = new HashMap<>();
-            response.put("token", jwtUtil.generateToken(loggedUser));
+            response.put("token", jwtUtil.generateAccessToken(loggedUser));
             return response;
 
     }
