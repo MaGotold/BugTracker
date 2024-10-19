@@ -82,7 +82,9 @@ public class AuthService {
 
             User loggedUser = userRepository.findByUsername(signInDto.getUsernameOrEmail());
             Map<String, String> response = new HashMap<>();
-            response.put("token", jwtUtil.generateAccessToken(loggedUser));
+            response.put("Access JWT token", jwtUtil.generateAccessToken(loggedUser));
+            response.put("Refresh JWT token", jwtUtil.generateRefreshToken(loggedUser));
+            response.put("username", loggedUser.getUsername());
             return response;
 
     }

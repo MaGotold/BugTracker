@@ -62,8 +62,10 @@ public class AuthController {
     @PostMapping("/sign-in")
     public ResponseEntity<Map<String, String>> userSignIn(@Valid @RequestBody UserSignInDto userSignInDto){
         try {
-            Map<String, String> userInfo = authService.userSignIn(userSignInDto);
-            return ResponseEntity.ok(userInfo);
+            Map<String, String> response = authService.userSignIn(userSignInDto);
+            redisService.cacheJwtToken(response.get("username"), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
+            response.remove("username");
+            return ResponseEntity.ok(response);
         
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
