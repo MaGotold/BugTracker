@@ -2,8 +2,17 @@ package com.example.bugtracker.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Collections;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +30,7 @@ import com.example.bugtracker.security.JwtUtil;
 
 
 
+
 @Service
 public class AuthService {
 
@@ -30,6 +40,8 @@ public class AuthService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private RedisService redisService;
    
 
     public Map<String, String> registerUser(UserRegistrationDto registrationDto) {
@@ -54,11 +66,15 @@ public class AuthService {
             newUser.setEmail(registrationDto.getEmail());
             newUser.setPassword(bCryptPasswordEncoder.encode(registrationDto.getPassword()));
             newUser.setRole(roleEnum);
-
             userRepository.save(newUser);
+
             Map<String, String> response = new HashMap<>();
             response.put("Access JWT token", jwtUtil.generateAccessToken(newUser));
             response.put("Refresh JWT token", jwtUtil.generateRefreshToken(newUser));
+
+            redisService.cacheJwtToken(newUser.getUsername(), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
+            this.setSecurityContext(newUser);
+
             return response;
             
         } catch (Exception e) {
@@ -84,9 +100,19 @@ public class AuthService {
             Map<String, String> response = new HashMap<>();
             response.put("Access JWT token", jwtUtil.generateAccessToken(loggedUser));
             response.put("Refresh JWT token", jwtUtil.generateRefreshToken(loggedUser));
-            response.put("username", loggedUser.getUsername());
+
+            redisService.cacheJwtToken(loggedUser.getUsername(), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
+            this.setSecurityContext(loggedUser);
+
             return response;
 
+    }
+
+
+    private void setSecurityContext(User user) {
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
     
 }

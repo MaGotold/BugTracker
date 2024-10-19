@@ -49,7 +49,6 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> userRegistration(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
         try {
             Map<String, String> response = authService.registerUser(userRegistrationDto);
-            redisService.cacheJwtToken(userRegistrationDto.getUsername(), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
             return ResponseEntity.ok(response); 
 
         } catch(Exception e) {
@@ -63,8 +62,6 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> userSignIn(@Valid @RequestBody UserSignInDto userSignInDto){
         try {
             Map<String, String> response = authService.userSignIn(userSignInDto);
-            redisService.cacheJwtToken(response.get("username"), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
-            response.remove("username");
             return ResponseEntity.ok(response);
         
         } catch (Exception e) {

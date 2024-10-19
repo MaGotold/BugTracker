@@ -31,8 +31,8 @@ public class SecurityConfig {
                 .requestMatchers("/auth/sign-up","/auth/sign-in").permitAll() 
                 .anyRequest().authenticated() 
             )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add the JWT filter
-
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); 
+            
         return http.build();
     }
 }
