@@ -2,13 +2,11 @@ package com.example.bugtracker.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+
 
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
-import com.example.bugtracker.security.JwtUtil;
 import com.example.bugtracker.service.AuthService;
-import com.example.bugtracker.service.RedisService;
 
 import org.springframework.http.HttpStatus;
 
@@ -21,6 +19,7 @@ import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -37,10 +36,7 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
-    @Autowired
-    private RedisService redisService;
-    @Autowired
-    private JwtUtil jwtUtil;
+    
     
     //todo add email verification
     //todo add password confirmation
@@ -72,8 +68,18 @@ public class AuthController {
 
 
     @PostMapping("/logout")
-    public ResponseEntity<?> userLogout(@RequestHeader(name = "Authorization") String authHeader) {
-        return ResponseEntity.ok("User logged out successfully.");
+    public ResponseEntity<?> userLogout(@RequestBody Map<String, String> token) {
+        try {
+            String refreshToken = token.get("Refresh JWT token");
+            authService.userLogout(refreshToken);
+            return ResponseEntity.ok("User logged out successfully.");
+
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
     }
 }
 

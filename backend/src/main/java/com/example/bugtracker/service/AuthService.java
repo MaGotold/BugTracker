@@ -8,7 +8,7 @@ import java.util.Collections;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
+import org.springframework.security.core.Authentication;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,9 +111,36 @@ public class AuthService {
 
     private void setSecurityContext(User user) {
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+        UsernamePasswordAuthenticationToken authentication = 
+            new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-    
+
+
+    public void userLogout(String token) {
+            try {
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                
+                if (authentication == null) {
+                    throw new IllegalStateException("User is not authenticated.");
+                }
+        
+                String subject = authentication.getName();
+                if (subject == null) {
+                    throw new IllegalStateException("User information not found in Security Context.");
+                }
+        
+                redisService.deleteSession(token, subject); // Invalidate token from Redis
+                SecurityContextHolder.clearContext();  // Clear Security Context for the current request
+        
+            } catch (NullPointerException e) {
+                throw new IllegalStateException("Error during logout: Authentication details missing.", e);
+            } catch (Exception e) {
+                throw new RuntimeException("An unexpected error occurred while logging out: " + e.getMessage(), e);
+            }
+        }
+        
 }
+    
+
 
