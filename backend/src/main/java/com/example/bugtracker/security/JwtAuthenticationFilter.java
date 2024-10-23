@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
             String path = request.getRequestURI();
-            if(path.contains("/auth/sign-in") || path.contains("/auth/sign-up")) {
+            if(path.contains("/auth/sign-in") || path.contains("/auth/sign-up") || path.contains("/auth/refresh")) {
                 filterChain.doFilter(request, response);
                 return;
             }

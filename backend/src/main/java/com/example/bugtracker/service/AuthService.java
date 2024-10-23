@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
+import com.example.bugtracker.dto.RefreshTokenDto;
 import com.example.bugtracker.exception.EmailAlreadyExistsException;
 import com.example.bugtracker.exception.InvalidPasswordException;
 import com.example.bugtracker.exception.RoleIsMissingException;
@@ -133,12 +133,25 @@ public class AuthService {
         }
 
 
-        private void setSecurityContext(User user) {
-            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
-            UsernamePasswordAuthenticationToken authentication = 
-                new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
+    public Map<String, String> refreshToken(String token, RefreshTokenDto refreshTokenDto){
+        String key = refreshTokenDto.getUsername();
+        redisService.deleteSession(token, key); 
+        User loggedUser = userRepository.findByUsername(refreshTokenDto.getUsername());
+        Map<String, String> response = new HashMap<>();
+        response.put("Access JWT token", jwtUtil.generateAccessToken(loggedUser));
+        response.put("Refresh JWT token", jwtUtil.generateRefreshToken(loggedUser));
+        redisService.cacheJwtToken(key, response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
+        return response;
+    }
+
+
+
+    private void setSecurityContext(User user) {
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
+        UsernamePasswordAuthenticationToken authentication = 
+            new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 
         
 }

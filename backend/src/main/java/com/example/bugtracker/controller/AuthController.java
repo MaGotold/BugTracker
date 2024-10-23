@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
+import com.example.bugtracker.dto.RefreshTokenDto;
 import com.example.bugtracker.service.AuthService;
 
 import org.springframework.http.HttpStatus;
@@ -80,6 +81,19 @@ public class AuthController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
+    }
+
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authHeader, @RequestBody RefreshTokenDto username) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Refresh token is missing or invalid.");
+        }
+        String token = authHeader.substring(7);
+        Map<String, String> response = new HashMap<>();
+        response = authService.refreshToken(token, username);
+        return ResponseEntity.ok(response);
+
     }
 }
 
