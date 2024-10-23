@@ -1,13 +1,15 @@
 package com.example.bugtracker.service;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import java.util.concurrent.TimeUnit;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
+
 import com.example.bugtracker.exception.SessionNotFoundException;
 
 
@@ -36,6 +38,12 @@ public class RedisService {
         } catch (Exception e) {
             throw new RuntimeException("An unexpected error occurred while caching JWT token: " + e.getMessage(), e);
         }
+    }
+
+
+    public void blacklistJwtToken(String token) {
+        String tokenData = "Blacklist-token:" + token;
+        redisTemplate.opsForValue().set(tokenData, "blacklisted", )
     }
 
 
