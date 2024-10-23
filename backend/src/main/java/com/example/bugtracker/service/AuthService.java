@@ -22,6 +22,8 @@ import com.example.bugtracker.exception.InvalidPasswordException;
 import com.example.bugtracker.exception.RoleIsMissingException;
 import com.example.bugtracker.exception.UserAlreadyExistsException;
 import com.example.bugtracker.exception.UserNotFoundException;
+import com.example.bugtracker.exception.TokenNotFoundException;
+import com.example.bugtracker.exception.TokenInvalidException;
 import com.example.bugtracker.model.User;
 import com.example.bugtracker.model.enums.Role;
 import com.example.bugtracker.repository.UserRepository;
@@ -135,6 +137,15 @@ public class AuthService {
 
     public Map<String, String> refreshToken(String token, RefreshTokenDto refreshTokenDto){
         String key = refreshTokenDto.getUsername();
+
+        if (token == null || !redisService.isTokenBlacklisted(token)) {
+            throw new TokenInvalidException("The provided refresh token is invalid or blacklisted.");
+        }
+    
+        if (!userRepository.existsByUsername(refreshTokenDto.getUsername())) {
+            throw new UserNotFoundException("User not found for username: " + refreshTokenDto.getUsername());
+        }
+        
         redisService.deleteSession(token, key); 
         User loggedUser = userRepository.findByUsername(refreshTokenDto.getUsername());
         Map<String, String> response = new HashMap<>();

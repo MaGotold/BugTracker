@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
+import com.example.bugtracker.exception.TokenInvalidException;
+import com.example.bugtracker.exception.UserNotFoundException;
 import com.example.bugtracker.dto.RefreshTokenDto;
 import com.example.bugtracker.service.AuthService;
 
@@ -20,7 +22,6 @@ import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -90,10 +91,19 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Refresh token is missing or invalid.");
         }
         String token = authHeader.substring(7);
-        Map<String, String> response = new HashMap<>();
-        response = authService.refreshToken(token, username);
-        return ResponseEntity.ok(response);
+        try {
+            Map<String, String> response = authService.refreshToken(token, username);
+            return ResponseEntity.ok(response);
 
+        } catch (TokenInvalidException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+        }
     }
 }
 
