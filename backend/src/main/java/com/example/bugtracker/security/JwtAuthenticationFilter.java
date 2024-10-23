@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.FilterChain;
 import java.util.List;
+import java.util.Map;
 
 import io.jsonwebtoken.Jwts;
 import java.util.Collections;
@@ -41,37 +42,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String header = request.getHeader("Authorization");
             String token = null;
+            
             if(token == null && header.startsWith("Bearer ")) {
                 token = header.substring(7);
             }
 
-            if(token != null) {
-                try {
-                    Claims claims = Jwts.parser()
-                        .setSigningKey(jwtUtil.getSecretKey())
-                        .parseClaimsJws(token)
-                        .getBody();
+            
+            Map<String, String> claims = jwtUtil.parseSubjectAndRole(token);
 
-                    String username = claims.getSubject();
-                    long id = claims.get("id", Long.class);
-                    String email = claims.get("email", String.class);
-                    String role = claims.get("role", String.class);
+            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(claims.get("role")));
+            UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(claims.get("subject"), null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
-                    UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(username, null, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-
-                } catch(SignatureException e) {
-                    respone.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT signature");
-                    return;
-
-                } catch(Exception e) {
-                    respone.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
-                    return;
-                }
-            }
             filterChain.doFilter(request, respone);
         }
     
