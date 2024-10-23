@@ -129,6 +129,7 @@ public class AuthService {
                 }
         
                 redisService.deleteSession(token, subject); 
+                redisService.blacklistJwtToken(token, jwtUtil.parseExpiration(token));
                 SecurityContextHolder.clearContext();   
         
             } catch (NullPointerException e) {

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -41,9 +42,18 @@ public class RedisService {
     }
 
 
-    public void blacklistJwtToken(String token) {
-        String tokenData = "Blacklist-token:" + token;
-        redisTemplate.opsForValue().set(tokenData, "blacklisted", )
+    public void blacklistJwtToken(String token, Date expirationTime) {
+        if(expirationTime == null){
+            throw new RuntimeException("Invalid token, cannot be blacklisted");
+        }
+
+        long remainingExpirationTime = expirationTime.getTime() - System.currentTimeMillis();
+
+        if(remainingExpirationTime > 0) {
+            String redisKey = "blacklisted: " + token;
+            redisTemplate.opsForValue().set(redisKey, "blacklisted");
+            redisTemplate.expire(redisKey ,remainingExpirationTime, TimeUnit.MILLISECONDS);
+        } else {throw new RuntimeException("Token has already expired."); }
     }
 
 

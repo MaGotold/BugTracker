@@ -18,10 +18,7 @@ import jakarta.servlet.FilterChain;
 import java.util.List;
 import java.util.Map;
 
-import io.jsonwebtoken.Jwts;
 import java.util.Collections;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.Claims;
 
 
 @Component
@@ -42,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String header = request.getHeader("Authorization");
             String token = null;
-            
+
             if(token == null && header.startsWith("Bearer ")) {
                 token = header.substring(7);
             }
