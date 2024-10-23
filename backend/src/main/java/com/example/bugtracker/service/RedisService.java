@@ -108,4 +108,12 @@ public class RedisService {
             throw new SessionNotFoundException("No session found for the provided token.");
         }
     }
+
+
+    public boolean isTokenBlacklisted(String token){
+        String redisKey = "Blacklisted" + token;
+        return redisTemplate.hasKey(redisKey);
+    }
+
+
 }

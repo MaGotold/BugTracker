@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -107,14 +108,6 @@ public class AuthService {
     }
 
 
-    private void setSecurityContext(User user) {
-        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
-        UsernamePasswordAuthenticationToken authentication = 
-            new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-
-
     public void userLogout(String token) {
             try {
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -138,6 +131,15 @@ public class AuthService {
                 throw new RuntimeException("An unexpected error occurred while logging out: " + e.getMessage(), e);
             }
         }
+
+
+        private void setSecurityContext(User user) {
+            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
+            UsernamePasswordAuthenticationToken authentication = 
+                new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
         
 }
     

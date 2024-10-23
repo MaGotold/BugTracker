@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.Collections;
+import com.example.bugtracker.service.RedisService;
 
 
 @Component
@@ -26,14 +27,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     JwtUtil jwtUtil;
+    @Autowired
+    RedisService redisService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse respone, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
 
             String path = request.getRequestURI();
             if(path.contains("/auth/sign-in") || path.contains("/auth/sign-up")) {
-                filterChain.doFilter(request, respone);
+                filterChain.doFilter(request, response);
                 return;
             }
 
@@ -44,6 +47,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 token = header.substring(7);
             }
 
+            if(token != null && redisService.isTokenBlacklisted(token) == true) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Token is invalid.");
+                return; 
+            }
+
             
             Map<String, String> claims = jwtUtil.parseSubjectAndRole(token);
 
@@ -52,7 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 new UsernamePasswordAuthenticationToken(claims.get("subject"), null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            filterChain.doFilter(request, respone);
+            filterChain.doFilter(request, response);
         }
     
 }
