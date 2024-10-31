@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Tracker Dashboard</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to the CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px; /* Increased width for side-by-side layout */
+            margin: auto;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .project-list {
+            display: flex; /* Use flexbox for side-by-side layout */
+            flex-wrap: wrap; /* Allow items to wrap to the next line if needed */
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .project {
+            background: white;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 1 1 30%; /* Flex-grow, flex-shrink, flex-basis */
+            min-width: 300px; /* Minimum width for responsiveness */
+        }
+
+        .feature-list, .bug-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .feature {
+            background-color: #e1f5fe; /* Light blue for features */
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .bug {
+            background-color: #ffe0b2; /* Light orange for bugs */
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .project-title, .feature-title, .bug-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .project-description, .feature-description, .bug-description {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stats {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .assigned {
+            color: green;
+            font-weight: bold;
+        }
+
+        .not-assigned {
+            color: red;
+            font-weight: bold;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px; /* Added margin for separation */
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Bug Tracker Dashboard</h1>
+</header>
+
+<div class="container">
+    <h2>Your overview</h2>
+    <ul class="project-list">
+        <li class="project">
+            <div class="project-title">Project Alpha</div>
+            <div class="project-description">A brief description of Project Alpha.</div>
+            <div class="stats">Open Features: 3 / Total: 5</div>
+
+            <h3>Features</h3>
+            <ul class="feature-list">
+                <li class="feature">
+                    <div class="feature-title">Feature 1: User Authentication</div>
+                    <div class="feature-description">Implement user login and registration.</div>
+                    <div class="stats">Open Bugs: 2 / Total: 4</div>
+
+                    <h4>Bugs</h4>
+                    <ul class="bug-list">
+                        <li class="bug">
+                            <div class="bug-title">Bug 1: Password Reset Email Not Sent</div>
+                            <div class="bug-description">Users are not receiving the password reset email. <span class="assigned">[Assigned to You]</span></div>
+                        </li>
+                        <li class="bug">
+                            <div class="bug-title">Bug 2: Incorrect Username Error</div>
+                            <div class="bug-description">The application shows incorrect error for valid usernames. <span class="not-assigned">[Not Assigned]</span></div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="feature">
+                    <div class="feature-title">Feature 2: Profile Management</div>
+                    <div class="feature-description">Users can manage their profiles.</div>
+                    <div class="stats">Open Bugs: 1 / Total: 1</div>
+
+                    <h4>Bugs</h4>
+                    <ul class="bug-list">
+                        <li class="bug">
+                            <div class="bug-title">Bug 1: Profile Picture Upload Fails</div>
+                            <div class="bug-description">The application crashes when uploading profile pictures. <span class="not-assigned">[Not Assigned]</span></div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+
+        <li class="project">
+            <div class="project-title">Project Beta</div>
+            <div class="project-description">A brief description of Project Beta.</div>
+            <div class="stats">Open Features: 2 / Total: 3</div>
+
+            <h3>Features</h3>
+            <ul class="feature-list">
+                <li class="feature">
+                    <div class="feature-title">Feature 1: Dashboard Overview</div>
+                    <div class="feature-description">Users can see an overview of their activities.</div>
+                    <div class="stats">Open Bugs: 0 / Total: 0</div>
+                </li>
+                <li class="feature">
+                    <div class="feature-title">Feature 2: Notifications</div>
+                    <div class="feature-description">Users receive notifications for important events.</div>
+                    <div class="stats">Open Bugs: 3 / Total: 3</div>
+
+                    <h4>Bugs</h4>
+                    <ul class="bug-list">
+                        <li class="bug">
+                            <div class="bug-title">Bug 1: Notification Bell Not Working</div>
+                            <div class="bug-description">Users do not see notifications in the bell icon. <span class="not-assigned">[Not Assigned]</span></div>
+                        </li>
+                        <li class="bug">
+                            <div class="bug-title">Bug 2: Notification Duplication</div>
+                            <div class="bug-description">Duplicate notifications are sent for the same event. <span class="not-assigned">[Not Assigned]</span></div>
+                        </li>
+                        <li class="bug">
+                            <div class="bug-title">Bug 3: Missed Notifications</div>
+                            <div class="bug-description">Some notifications are missed and not displayed. <span class="not-assigned">[Not Assigned]</span></div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    
+
+    <button>Create New Project</button>
+    <button>Create New Feature</button>
+    <button>Create New Bug</button>
+</div>
+
+</body>
+</html>
