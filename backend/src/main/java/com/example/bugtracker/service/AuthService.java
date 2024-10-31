@@ -22,7 +22,6 @@ import com.example.bugtracker.exception.InvalidPasswordException;
 import com.example.bugtracker.exception.RoleIsMissingException;
 import com.example.bugtracker.exception.UserAlreadyExistsException;
 import com.example.bugtracker.exception.UserNotFoundException;
-import com.example.bugtracker.exception.TokenNotFoundException;
 import com.example.bugtracker.exception.TokenInvalidException;
 import com.example.bugtracker.model.User;
 import com.example.bugtracker.model.enums.Role;

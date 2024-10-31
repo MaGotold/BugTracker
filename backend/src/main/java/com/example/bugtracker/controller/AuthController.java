@@ -1,30 +1,25 @@
 package com.example.bugtracker.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-
-import com.example.bugtracker.dto.UserRegistrationDto;
-import com.example.bugtracker.dto.UserSignInDto;
-import com.example.bugtracker.exception.TokenInvalidException;
-import com.example.bugtracker.exception.UserNotFoundException;
-import com.example.bugtracker.dto.RefreshTokenDto;
-import com.example.bugtracker.service.AuthService;
-
-import org.springframework.http.HttpStatus;
-
-
-import jakarta.validation.Valid;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.bugtracker.dto.RefreshTokenDto;
+import com.example.bugtracker.dto.UserRegistrationDto;
+import com.example.bugtracker.dto.UserSignInDto;
+import com.example.bugtracker.exception.TokenInvalidException;
+import com.example.bugtracker.exception.UserNotFoundException;
+import com.example.bugtracker.service.AuthService;
+
+import jakarta.validation.Valid;
 
 
 
@@ -42,7 +37,7 @@ public class AuthController {
     
     //todo add email verification
     //todo add password confirmation
-    //todo changed role so specifying role upon registration is needed... add role field
+    //todo change role so specifying role upon registration is needed... add role field
     @PostMapping("/sign-up")
     public ResponseEntity<Map<String, String>> userRegistration(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
         try {
