@@ -6,7 +6,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.util.HashSet;
 import java.util.Set;
-import com.example.bugtracker.model.enums.Role;
 
 
 
@@ -70,19 +69,19 @@ public class User {
     }
 
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private Role role;
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role roleId;
 
-    public Role getRole(){
-        return role;
+    public Role getRoleId(){
+        return roleId;
     }
 
-    public void setRole(Role role){
-        if (role == null) {
+    public void setRoleId(Role roleId){
+        if (roleId == null) {
             throw new IllegalArgumentException("Role cannot be empty");
         }
-        this.role = role;
+        this.roleId = roleId;
     }
 
 

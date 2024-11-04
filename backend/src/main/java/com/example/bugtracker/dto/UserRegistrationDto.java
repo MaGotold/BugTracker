@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import com.example.bugtracker.model.enums.Role;
 
 public class UserRegistrationDto {
     
@@ -23,7 +22,7 @@ public class UserRegistrationDto {
     private String password;
 
     @NotNull(message = "Please select your role")
-    private Role role;
+    private String role;
 
 
     public String getUsername(){
@@ -52,11 +51,11 @@ public class UserRegistrationDto {
         this.email = email;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 

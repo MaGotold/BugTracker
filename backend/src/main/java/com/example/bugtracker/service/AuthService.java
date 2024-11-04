@@ -1,30 +1,24 @@
 package com.example.bugtracker.service;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.bugtracker.dto.RefreshTokenDto;
 import com.example.bugtracker.dto.UserRegistrationDto;
 import com.example.bugtracker.dto.UserSignInDto;
-import com.example.bugtracker.dto.RefreshTokenDto;
 import com.example.bugtracker.exception.EmailAlreadyExistsException;
 import com.example.bugtracker.exception.InvalidPasswordException;
 import com.example.bugtracker.exception.RoleIsMissingException;
+import com.example.bugtracker.exception.TokenInvalidException;
 import com.example.bugtracker.exception.UserAlreadyExistsException;
 import com.example.bugtracker.exception.UserNotFoundException;
-import com.example.bugtracker.exception.TokenInvalidException;
 import com.example.bugtracker.model.User;
-import com.example.bugtracker.model.enums.Role;
 import com.example.bugtracker.repository.UserRepository;
 import com.example.bugtracker.security.JwtUtil;
 
@@ -59,13 +53,13 @@ public class AuthService {
         }
 
         try {
-            String role = registrationDto.getRole().name();
-            Role roleEnum = Role.valueOf(role);
+            //String role = registrationDto.getRole().name();
+            //Role roleEnum = Role.valueOf(role);
             User newUser = new User();
             newUser.setUsername(registrationDto.getUsername());
             newUser.setEmail(registrationDto.getEmail());
             newUser.setPassword(bCryptPasswordEncoder.encode(registrationDto.getPassword()));
-            newUser.setRole(roleEnum);
+            //newUser.setRole(roleEnum);
             userRepository.save(newUser);
 
             Map<String, String> response = new HashMap<>();
@@ -73,7 +67,7 @@ public class AuthService {
             response.put("Refresh JWT token", jwtUtil.generateRefreshToken(newUser));
 
             redisService.cacheJwtToken(newUser.getUsername(), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
-            this.setSecurityContext(newUser);
+            //this.setSecurityContext(newUser);
 
             return response;
             
@@ -102,7 +96,7 @@ public class AuthService {
             response.put("Refresh JWT token", jwtUtil.generateRefreshToken(loggedUser));
 
             redisService.cacheJwtToken(loggedUser.getUsername(), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
-            this.setSecurityContext(loggedUser);
+            //this.setSecurityContext(loggedUser);
 
             return response;
 
@@ -155,7 +149,7 @@ public class AuthService {
     }
 
 
-
+/* 
     private void setSecurityContext(User user) {
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
         UsernamePasswordAuthenticationToken authentication = 
@@ -163,7 +157,7 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-        
+       */ 
 }
     
 
