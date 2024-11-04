@@ -71,17 +71,17 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
-    private Role roleId;
+    private Role role;
 
-    public Role getRoleId(){
-        return roleId;
+    public Role getRole(){
+        return role;
     }
 
-    public void setRoleId(Role roleId){
-        if (roleId == null) {
-            throw new IllegalArgumentException("Role cannot be empty");
+    public void setRole(Role role){
+        if (role == null) {
+            throw new IllegalArgumentException("Role can not be empty");
         }
-        this.roleId = roleId;
+        this.role = role;
     }
 
 

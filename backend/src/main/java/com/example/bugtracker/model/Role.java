@@ -24,17 +24,13 @@ public class Role {
     )
     private Set<Permission> permissions;
 
-    @OneToMany(mappedBy = "roleId")
+    @OneToMany(mappedBy = "role")
     private Set<User> users;
     
 
 
     public long getId() {
         return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
 

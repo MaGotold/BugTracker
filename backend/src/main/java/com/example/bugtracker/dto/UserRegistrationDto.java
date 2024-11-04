@@ -2,7 +2,6 @@ package com.example.bugtracker.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 
@@ -21,7 +20,7 @@ public class UserRegistrationDto {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    @NotNull(message = "Please select your role")
+    @NotBlank(message = "Please select your role")
     private String role;
 
 

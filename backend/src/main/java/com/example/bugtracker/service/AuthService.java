@@ -2,9 +2,13 @@ package com.example.bugtracker.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,8 +23,15 @@ import com.example.bugtracker.exception.TokenInvalidException;
 import com.example.bugtracker.exception.UserAlreadyExistsException;
 import com.example.bugtracker.exception.UserNotFoundException;
 import com.example.bugtracker.model.User;
+import com.example.bugtracker.model.Role;
+import com.example.bugtracker.model.Permission;
 import com.example.bugtracker.repository.UserRepository;
+import com.example.bugtracker.repository.RoleRepository;
 import com.example.bugtracker.security.JwtUtil;
+
+import java.util.List;
+
+import com.example.bugtracker.repository.PermissionRepository;
 
 
 
@@ -31,11 +42,17 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private PermissionRepository permissionRepository;
+    @Autowired
+    private PermissionService permissionService;
    
 
     public Map<String, String> registerUser(UserRegistrationDto registrationDto) {
@@ -47,28 +64,26 @@ public class AuthService {
         if(userRepository.existsByEmail(registrationDto.getEmail())) {
             throw new EmailAlreadyExistsException("Email already exists");
         }
-
-        if(registrationDto.getRole() == null){
+        
+        if(!roleRepository.existsByName(registrationDto.getRole())){
             throw new RoleIsMissingException("Please select your role");
         }
 
         try {
-            //String role = registrationDto.getRole().name();
-            //Role roleEnum = Role.valueOf(role);
             User newUser = new User();
             newUser.setUsername(registrationDto.getUsername());
             newUser.setEmail(registrationDto.getEmail());
             newUser.setPassword(bCryptPasswordEncoder.encode(registrationDto.getPassword()));
-            //newUser.setRole(roleEnum);
-            userRepository.save(newUser);
+            newUser.setRole(roleRepository.findByName(registrationDto.getRole()));
 
             Map<String, String> response = new HashMap<>();
             response.put("Access JWT token", jwtUtil.generateAccessToken(newUser));
             response.put("Refresh JWT token", jwtUtil.generateRefreshToken(newUser));
 
             redisService.cacheJwtToken(newUser.getUsername(), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
-            //this.setSecurityContext(newUser);
+            this.setSecurityContext(newUser);
 
+            userRepository.save(newUser);
             return response;
             
         } catch (Exception e) {
@@ -96,7 +111,7 @@ public class AuthService {
             response.put("Refresh JWT token", jwtUtil.generateRefreshToken(loggedUser));
 
             redisService.cacheJwtToken(loggedUser.getUsername(), response.get("Refresh JWT token"), jwtUtil.getTtlExpirationForRedis());
-            //this.setSecurityContext(loggedUser);
+            this.setSecurityContext(loggedUser);
 
             return response;
 
@@ -149,15 +164,22 @@ public class AuthService {
     }
 
 
-/* 
+
     private void setSecurityContext(User user) {
-        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
+       /*  List<GrantedAuthority> authorities = permissionRepository.findPermissionByRoleId(user.getRole().getId()).stream()
+            .map(Permission -> new SimpleGrantedAuthority(Permission.getPermission()))
+            .collect(Collectors.toList());
+            */
+            List<GrantedAuthority> authorities = permissionService.findPermissionByRoleId(user.getRole().getId()).stream()
+            .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
+            .collect(Collectors.toList());
+
         UsernamePasswordAuthenticationToken authentication = 
             new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-       */ 
+       
 }
     
 
