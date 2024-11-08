@@ -1,6 +1,7 @@
 package com.example.bugtracker.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -23,15 +24,13 @@ import com.example.bugtracker.exception.TokenInvalidException;
 import com.example.bugtracker.exception.UserAlreadyExistsException;
 import com.example.bugtracker.exception.UserNotFoundException;
 import com.example.bugtracker.model.User;
+import com.example.bugtracker.repository.PermissionRepository;
+import com.example.bugtracker.repository.RoleRepository;
+import com.example.bugtracker.repository.UserRepository;
+import com.example.bugtracker.security.JwtUtil;
 import com.example.bugtracker.model.Role;
 import com.example.bugtracker.model.Permission;
-import com.example.bugtracker.repository.UserRepository;
-import com.example.bugtracker.repository.RoleRepository;
-import com.example.bugtracker.security.JwtUtil;
-
-import java.util.List;
-
-import com.example.bugtracker.repository.PermissionRepository;
+import java.util.Set;
 
 
 
@@ -146,7 +145,7 @@ public class AuthService {
     public Map<String, String> refreshToken(String token, RefreshTokenDto refreshTokenDto){
         String key = refreshTokenDto.getUsername();
 
-        if (token == null || !redisService.isTokenBlacklisted(token)) {
+        if (token == null || redisService.isTokenBlacklisted(token)) {
             throw new TokenInvalidException("The provided refresh token is invalid or blacklisted.");
         }
     
@@ -166,13 +165,10 @@ public class AuthService {
 
 
     private void setSecurityContext(User user) {
-       /*  List<GrantedAuthority> authorities = permissionRepository.findPermissionByRoleId(user.getRole().getId()).stream()
+        List<GrantedAuthority> authorities = user.getRole().getPermissions().stream()
             .map(Permission -> new SimpleGrantedAuthority(Permission.getPermission()))
             .collect(Collectors.toList());
-            */
-            List<GrantedAuthority> authorities = permissionService.findPermissionByRoleId(user.getRole().getId()).stream()
-            .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
-            .collect(Collectors.toList());
+           
 
         UsernamePasswordAuthenticationToken authentication = 
             new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);

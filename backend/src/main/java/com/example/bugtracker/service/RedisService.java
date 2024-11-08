@@ -111,7 +111,7 @@ public class RedisService {
 
 
     public boolean isTokenBlacklisted(String token){
-        String redisKey = "Blacklisted" + token;
+        String redisKey = "Blacklisted " + token;
         return redisTemplate.hasKey(redisKey);
     }
 

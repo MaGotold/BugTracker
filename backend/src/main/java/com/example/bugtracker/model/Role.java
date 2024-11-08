@@ -1,7 +1,7 @@
 package com.example.bugtracker.model;
 
 import jakarta.persistence.*;
-
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -11,7 +11,7 @@ import java.util.Set;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    private Long id;
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
@@ -22,14 +22,14 @@ public class Role {
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<Permission> permissions;
+    private Set<Permission> permissions = new HashSet<>();
 
-    @OneToMany(mappedBy = "role")
-    private Set<User> users;
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    private Set<User> users = new HashSet<>();
     
 
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
