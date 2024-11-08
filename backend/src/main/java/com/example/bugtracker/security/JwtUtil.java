@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 
 import com.example.bugtracker.model.User;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 
 
@@ -34,7 +34,7 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
         claims.put("email", user.getEmail());
-        claims.put("role", user.getRole().getId());
+        claims.put("role", user.getRole().toString());
         return createToken(claims, user.getUsername(), EXPIRATION_TIME_ACCESS_TOKEN);
     }
     
@@ -93,12 +93,27 @@ public class JwtUtil {
             System.out.println("Failed to retrieve claims from token.");
 
         } else {
+            Object roleClaimObject = claims.get("role");
+            String roleAsString;
+            if(roleClaimObject instanceof String) {
+                roleAsString = (String) roleClaimObject;
+            } else { roleAsString = String.valueOf(roleClaimObject); }
+            
             response.put("subject",claims.getSubject());
-            response.put("role", claims.get("role", String.class));
+            response.put("role",roleAsString);
             return response;
         }
         return null;
     }   
+
+    
+    public Map<String, String> parseSubject(String token) {
+        Claims claims = this.getClaims(token);
+        Map<String, String> response = new HashMap<>();
+
+        response.put("subject",claims.getSubject());
+        return response;
+    }
 
 
     public Date parseExpiration(String token) {

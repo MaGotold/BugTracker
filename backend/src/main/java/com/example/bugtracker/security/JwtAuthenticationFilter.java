@@ -1,7 +1,6 @@
 package com.example.bugtracker.security;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,9 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.bugtracker.model.Permission;
 import com.example.bugtracker.model.User;
-import com.example.bugtracker.repository.PermissionRepository;
+import com.example.bugtracker.repository.UserRepository;
 import com.example.bugtracker.service.RedisService;
 
 import jakarta.servlet.FilterChain;
@@ -33,7 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     RedisService redisService;
     @Autowired
-    PermissionRepository permissionRepository;
+    UserRepository userRepository;
+    
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -58,14 +57,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             
-            Map<String, String> claims = jwtUtil.parseSubjectAndRole(token);
+            Map<String, String> claims = jwtUtil.parseSubject(token);
+            User user = userRepository.findByUsername(claims.get("subject"));
+            //here is permission set null because there is no session 
+            //fix
+            List<GrantedAuthority> authorities = userRepository.findByUsername(claims.get("subject")).getRole().getPermissions().stream()
+                .map(Permission -> new SimpleGrantedAuthority(Permission.getPermission()))
+                .collect(Collectors.toList());
+           
 
-            List<GrantedAuthority> authorities = claims.get("role").getPermissions().stream()
-            .map(Permission -> new SimpleGrantedAuthority(Permission.getPermission()))
-            .collect(Collectors.toList());
-
-            UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(claims.get("subject"), null, authorities);
+            UsernamePasswordAuthenticationToken authentication = 
+                new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);

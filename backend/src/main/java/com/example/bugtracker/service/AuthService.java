@@ -24,13 +24,9 @@ import com.example.bugtracker.exception.TokenInvalidException;
 import com.example.bugtracker.exception.UserAlreadyExistsException;
 import com.example.bugtracker.exception.UserNotFoundException;
 import com.example.bugtracker.model.User;
-import com.example.bugtracker.repository.PermissionRepository;
 import com.example.bugtracker.repository.RoleRepository;
 import com.example.bugtracker.repository.UserRepository;
 import com.example.bugtracker.security.JwtUtil;
-import com.example.bugtracker.model.Role;
-import com.example.bugtracker.model.Permission;
-import java.util.Set;
 
 
 
@@ -48,10 +44,7 @@ public class AuthService {
     private JwtUtil jwtUtil;
     @Autowired
     private RedisService redisService;
-    @Autowired
-    private PermissionRepository permissionRepository;
-    @Autowired
-    private PermissionService permissionService;
+
    
 
     public Map<String, String> registerUser(UserRegistrationDto registrationDto) {
